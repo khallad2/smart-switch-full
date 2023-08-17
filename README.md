@@ -1,7 +1,9 @@
 # Welcome to Smart-Switch
 
 ## Overview
-
+<p align="center">
+  <img src="assets/smart-switch.jpg" alt="Smart-Switch" width="400">
+</p>
 Experience the future of home automation with our revolutionary Smart-Switch. This innovative device empowers you with seamless control over your lighting, offering unparalleled convenience and energy efficiency. Whether you're at home or halfway across the world, the Smart-Switch gives you the power to transform your environment with a simple tap.
 
 ## Features
