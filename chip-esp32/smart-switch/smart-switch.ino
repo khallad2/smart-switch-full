@@ -22,8 +22,8 @@ void setup() {
     }
 
     Serial.println("Connected to WiFi");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    // Serial.print("IP address: ");
+    // Serial.println(WiFi.localIP());
     myServo.attach(servoPin);
     myServo.write(0);
 
@@ -34,13 +34,15 @@ void setup() {
             if(mySwitch == 1) {
               toggleServo();
             } else {
-              request->send(400, "text/plain", "Invalid switch parameter");
+              request->send(400, "application/json", "{\"message\":\"Invalid switch parameter\"}");
             }
-            request->send(200, "text/plain", "Angle set to: " + value);
+            String response = "{\"message\":\"" + String(switched ? "On" : "Off") + "\"}";
+            request->send(200, "application/json", response);
         } else {
-            request->send(400, "text/plain", "Missing switch parameter");
+            request->send(400, "application/json", "{\"message\":\"Missing switch parameter\"}");
         }
     });
+
     server.begin();
 }
 
@@ -51,4 +53,6 @@ void toggleServo(){
   myServo.write(newAngle);
 }
 
-void loop() {}
+void loop() {
+  
+}
