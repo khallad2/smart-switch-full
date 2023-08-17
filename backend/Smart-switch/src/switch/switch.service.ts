@@ -23,7 +23,7 @@ export class SwitchService {
     //     return switchData.save();
     // }
 
-    async toggleState(object_id: string): Promise<SwitchSchema> {
+    async toggleState(object_id: string): Promise<Switch> {
         const existingSwitch = await this.switchModel.findById(object_id);
         if (!existingSwitch) {
             throw new NotFoundException('Switch not found');

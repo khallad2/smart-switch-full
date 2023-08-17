@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Appbar, Button } from 'react-native-paper';
 
-import { Appbar } from 'react-native-paper';
+import Switch from './switch/switch'; // Import the Switch component
 
-const END_POINT = 'http://192.168.178.33/setAngle?switch=1';
-var switchState = 0;
 export default function App() {
   const [data, setData] = useState(null);
-  const [switched, setSwitched] = useState(false); // Initialize with false
-
+  const [switched, setSwitched] = useState(false);
+  const [ipAddress, setIpAddress] = useState(''); // State to store the user-entered IP address
 
   const fetchData = async () => {
     try {
+      const END_POINT = `http://${ipAddress}/setAngle?switch=1`; // Build the END_POINT string with user-entered IP
       const response = await fetch(END_POINT);
-      console.log('response', response);
-      if(response.status === 200){
-        setSwitched((prevSwitched) => !prevSwitched); // Toggle the state
-      }
+      setSwitched((prevSwitched) => !prevSwitched);
       return response;
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -31,19 +28,14 @@ export default function App() {
             <Appbar.Content title="Smart Switch" />
           </Appbar.Header>
           <View style={styles.middleContainer}>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={fetchData}
-                activeOpacity={0.7}
-            >
-              <Text style={styles.buttonText}> {switched ? 'Switched ON' : 'Switched OFF'}</Text>
-            </TouchableOpacity>
+            <TextInput
+                style={styles.input}
+                placeholder="Enter IP Address"
+                value={ipAddress}
+                onChangeText={setIpAddress}
+            />
+            <Switch onPress={fetchData} switched={switched} />
           </View>
-          {/*{data ? (*/}
-          {/*    <Text style={styles.dataText}>{JSON.stringify(data)}</Text>*/}
-          {/*) : (*/}
-          {/*    <Text style={styles.dataText}>No data fetched yet.</Text>*/}
-          {/*)}*/}
         </View>
       </SafeAreaProvider>
   );
@@ -53,25 +45,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    justifyContent: 'center', // Center content vertically
+    justifyContent: 'center',
   },
   header: {
     backgroundColor: '#FFA500',
   },
   middleContainer: {
     flex: 1,
-    justifyContent: 'center', // Center content horizontally
-    alignItems: 'center', // Center content vertically
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#FFA500',
-    borderRadius: 50, // Make the button round
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 18,
+  input: {
+    width: '80%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   dataText: {
     fontSize: 18,
