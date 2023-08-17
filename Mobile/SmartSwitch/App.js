@@ -3,7 +3,8 @@ import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Appbar, Button } from 'react-native-paper';
 
-import Switch from './switch/switch'; // Import the Switch component
+import Switch from './switch/switch';
+import SwitchList from "./switch-list/switchList"; // Import the Switch component
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -70,3 +71,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
+// end of App.js

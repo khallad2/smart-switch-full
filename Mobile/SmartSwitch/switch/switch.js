@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export default function Switch ({ onPress, switched }) {
+const Switch = ({ onPress, switched }) => {
     return (
         <TouchableOpacity
             style={[styles.button, switched && styles.buttonActive]}
@@ -32,3 +32,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
+
+export default Switch;
