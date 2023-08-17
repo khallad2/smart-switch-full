@@ -1,22 +1,11 @@
 // SwitchList.js
 import React from 'react';
 import { FlatList, Text, View, StyleSheet } from 'react-native';
-
+import Switch from "../switch/switch";
 export default function SwitchList ({ switches }) {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Switch List</Text>
-            <FlatList
-                data={switches}
-                renderItem={({ item }) => (
-                    <View style={styles.switchItem}>
-                        <Text>Device Name: {item.device_name}</Text>
-                        <Text>Device IP: {item.device_ip}</Text>
-                        <Text>State: {item.state ? 'ON' : 'OFF'}</Text>
-                    </View>
-                )}
-                keyExtractor={(item) => item.device_id}
-            />
+            <Switch />
         </View>
     );
 };

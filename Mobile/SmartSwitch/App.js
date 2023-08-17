@@ -1,35 +1,18 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Appbar, Button } from 'react-native-paper';
 
-import Switch from './switch/switch'; // Import the Switch component
+import Switch from './switch/switch';
+import SwitchList from "./switch-list/switch-list"; // Import the Switch component
 
 export default function App() {
-  const [data, setData] = useState(null);
-  const [switched, setSwitched] = useState(false);
-  const [ipAddress, setIpAddress] = useState(''); // State to store the user-entered IP address
-
-  const fetchData = async () => {
-    try {
-      const END_POINT = `http://${ipAddress}/setAngle?switch=1`; // Build the END_POINT string with user-entered IP
-      const response = await fetch(END_POINT);
-      setSwitched((prevSwitched) => !prevSwitched);
-      return response;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
   return (
       <SafeAreaProvider>
         <View style={styles.container}>
           <Appbar.Header style={styles.header}>
             <Appbar.Content title="Smart Switch" />
           </Appbar.Header>
-          <View style={styles.container}>
-            <Switch onPress={fetchData} switched={switched} />
-          </View>
+           <SwitchList />
         </View>
       </SafeAreaProvider>
   );

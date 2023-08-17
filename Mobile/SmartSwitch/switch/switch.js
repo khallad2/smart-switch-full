@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Card, TextInput, Button } from 'react-native-paper';
 
-const Switch = ({ onPress, switched }) => {
+const Switch = ({ onPress }) => {
+    const [switched, setSwitched] = useState(false);
     const [deviceAddress, setDeviceAddress] = useState('');
     const [wifiName, setWifiName] = useState('');
     const [wifiPassword, setWifiPassword] = useState('');
