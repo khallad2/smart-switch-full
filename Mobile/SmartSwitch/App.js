@@ -3,8 +3,7 @@ import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Appbar, Button } from 'react-native-paper';
 
-import Switch from './switch/switch';
-import SwitchList from "./switch-list/switchList"; // Import the Switch component
+import Switch from './switch/switch'; // Import the Switch component
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -28,13 +27,7 @@ export default function App() {
           <Appbar.Header style={styles.header}>
             <Appbar.Content title="Smart Switch" />
           </Appbar.Header>
-          <View style={styles.middleContainer}>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter IP Address"
-                value={ipAddress}
-                onChangeText={setIpAddress}
-            />
+          <View style={styles.container}>
             <Switch onPress={fetchData} switched={switched} />
           </View>
         </View>
@@ -46,7 +39,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    justifyContent: 'center',
+    justifyContent: 'top',
   },
   header: {
     backgroundColor: '#FFA500',

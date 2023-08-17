@@ -6,6 +6,8 @@
 </p>
 Experience the future of home automation with our revolutionary Smart-Switch. This innovative device empowers you with seamless control over your lighting, offering unparalleled convenience and energy efficiency. Whether you're at home or halfway across the world, the Smart-Switch gives you the power to transform your environment with a simple tap.
 
+
+
 ## Features
 
 - **Global Remote Control**: Manage your lights from anywhere on the planet. Turn them on or off remotely, even when you're continents away.
