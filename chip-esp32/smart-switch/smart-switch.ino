@@ -1,35 +1,49 @@
 #include <Servo_ESP32.h>
 #include <WiFi.h>
+#include <WiFiManager.h>  // Add WiFiManager library
+#include <ArduinoJson.h>
 #include <ESPAsyncWebSrv.h>
 
-static const int servoPin = 14;  //printed G14 on the board
-const char* serverUrl = "http://localhost:3000/heartbeat"; // Replace with your server URL
+static const int servoPin = 14;
+const char* serverUrl = "http://localhost:3000/heartbeat";
 
 Servo_ESP32 myServo;
 WiFiClient client;
 
-const char* ssid = "Bananenkarton";
-const char* password = "88542283243511630573";
 bool switched = false;
 
-AsyncWebServer server(80);
+AsyncWebServer server(9090);
 
 void setup() {
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
+  WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
+  // WiFiManager Configuration
+  WiFiManager wm;
+  wm.resetSettings();
+  
+  bool res = wm.autoConnect("Smart-Switch", "password-switch");  // Change to desired Smart-Switch name and password
+  if(!res) {
+      Serial.println("Failed to connect");
+        // ESP.restart();
   }
 
-  Serial.println("Connected to WiFi");
-  // Serial.print("IP address: ");
-  // Serial.println(WiFi.localIP());
+  WiFi.begin(wm.getWiFiSSID().c_str(), wm.getWiFiPass().c_str());
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+  //if you get here you have connected to the WiFi    
+  Serial.println("connected...yeey :)");
+
   myServo.attach(servoPin);
+  myServo.write(1);
   myServo.write(0);
 
-  server.on("/setAngle", HTTP_GET, [](AsyncWebServerRequest* request) {
+
+  // API Requests Setup
+  server.on("/control", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam("switch")) {
       String value = request->getParam("switch")->value();
       int mySwitch = value.toInt();
@@ -38,7 +52,7 @@ void setup() {
       } else {
         request->send(400, "application/json", "{\"message\":\"Invalid switch parameter\"}");
       }
-      String response = "{\"message\":\"" + String(switched ? "On" : "Off") + "\"}";
+      String response = "{\"message\":\"" + String(switched ? "true" : "false") + "\"}";
       request->send(200, "application/json", response);
     } else {
       request->send(400, "application/json", "{\"message\":\"Missing switch parameter\"}");
@@ -55,23 +69,33 @@ void toggleServo() {
   myServo.write(newAngle);
 }
 
-void loop() {
-    if (client.connect(serverUrl, 3000)) {
-        client.print("GET /heartbeat?ip=");
-        client.print(WiFi.localIP()); // Include ESP32's IP address in the query parameter
-        client.println(" HTTP/1.1");
-        client.println("Host: example.com"); // Replace with your server's hostname
-        client.println("Connection: close");
-        client.println();
-        while (client.connected()) {
-            if (client.available()) {
-                Serial.write(client.read());
-            }
-        }
-        client.stop();
-    } else {
-        Serial.println("Connection failed");
-    }
+// void heartbeat() {
+//   asyncClient.onConnect([](void* obj, AsyncClient* asyncClient) {
+//     Serial.println("Connected to server");
+//     String request = "GET /heartbeat?ip=" + WiFi.localIP().toString() + " HTTP/1.1\r\n"
+//                     "Host: example.com\r\n"
+//                     "Connection: close\r\n\r\n";
+//     asyncClient->add(request.c_str(), request.length());
+//   }, NULL);
 
-    delay(10000); // Send heartbeat every 10 seconds
+//   asyncClient.onError([](void* obj, AsyncClient* asyncClient, int8_t error) {
+//     Serial.println("Connection error");
+//     asyncClient->close();
+//   }, NULL);
+
+//   asyncClient.onDisconnect([](void* obj, AsyncClient* asyncClient) {
+//     Serial.println("Disconnected from server");
+//     asyncClient->close();
+//   }, NULL);
+
+//   asyncClient.connect("example.com", 80);
+// }
+
+
+void loop() {
+  // if (WiFi.status() == WL_CONNECTED) {
+  //   heartbeat();
+  // }
+  // delay(10000); // Send heartbeat every 10 seconds
 }
+
