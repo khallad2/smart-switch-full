@@ -9,7 +9,7 @@ const Switch = ({ device, onPress, onRemove }) => {
     const fetchData = async () => {
         try {
             // todo move to env file
-            const END_POINT = `http://${deviceAddress}:9090/setAngle?switch=1`;
+            const END_POINT = `http://${deviceAddress}:9090/control?switch=1`;
             const response = await fetch(END_POINT);
             const responseData = await response.json(); // Get the response text
 
