@@ -1,12 +1,28 @@
-// SwitchList.js
 import React from 'react';
-import { FlatList, Text, View, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Switch from "../switch/switch";
-export default function SwitchList ({ switches }) {
+
+export default function SwitchList({ switches }) {
+    const devices = [
+        { id: 1, name: 'Living Room' },
+        { id: 2, name: 'Bed Room' },
+        // Add more devices here as needed
+    ];
+
+    const handleRemoveDevice = (deviceId) => {
+        // Implement logic to remove the device from the list
+    };
+
     return (
-        <View style={styles.container}>
-            <Switch />
-        </View>
+        <ScrollView contentContainerStyle={styles.container}>
+            {devices.map(device => (
+                <Switch
+                    key={device.id}
+                    device={device}
+                    onRemove={handleRemoveDevice}
+                />
+            ))}
+        </ScrollView>
     );
 };
 
