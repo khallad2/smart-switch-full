@@ -1,6 +1,7 @@
 #include <Servo_ESP32.h>
 #include <WiFi.h>
-#include <ESPAsyncWebSrv.h>
+#include <ArduinoJson.h> // Include the ArduinoJson library
+#include <ESPAsyncWebSrv.h> // Include the modified ESPAsyncWebServer library
 
 static const int servoPin = 14;  //printed G14 on the board
 const char* serverUrl = "http://localhost:3000/heartbeat"; // Replace with your server URL
@@ -16,23 +17,14 @@ AsyncWebServer server(80);
 
 void setup() {
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
+  connect_to_wifi(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-  }
-
-  Serial.println("Connected to WiFi");
-  // Serial.print("IP address: ");
-  // Serial.println(WiFi.localIP());
   myServo.attach(servoPin);
   myServo.write(0);
 
   server.on("/setAngle", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam("switch")) {
-      String value = request->getParam("switch")->value();
-      int mySwitch = value.toInt();
+      int mySwitch = request->getParam("switch")->value().toInt();
       if (mySwitch == 1) {
         toggleServo();
       } else {
@@ -48,6 +40,27 @@ void setup() {
   server.begin();
 }
 
+bool connect_to_wifi(const char* ssid, const char* password) {
+  if (ssid && password && strlen(ssid) > 0 && strlen(password) > 0) {
+    WiFi.begin(ssid, password);
+    int timeout = 10;
+    while (WiFi.status() != WL_CONNECTED && timeout > 0) {
+      delay(1000);
+      Serial.println("Connecting to WiFi...");
+      timeout--;
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("Connected to WiFi");
+      return true;
+    } else {
+      Serial.println("Failed to connect to WiFi");
+      return false;
+    }
+  }
+  return false;
+}
+
 void toggleServo() {
   int currentAngle = myServo.read();
   int newAngle = (currentAngle == 0) ? 180 : 0;
@@ -55,23 +68,32 @@ void toggleServo() {
   myServo.write(newAngle);
 }
 
-void loop() {
-    if (client.connect(serverUrl, 3000)) {
-        client.print("GET /heartbeat?ip=");
-        client.print(WiFi.localIP()); // Include ESP32's IP address in the query parameter
-        client.println(" HTTP/1.1");
-        client.println("Host: example.com"); // Replace with your server's hostname
-        client.println("Connection: close");
-        client.println();
-        while (client.connected()) {
-            if (client.available()) {
-                Serial.write(client.read());
-            }
-        }
-        client.stop();
-    } else {
-        Serial.println("Connection failed");
-    }
+// void heartbeat() {
+//   asyncClient.onConnect([](void* obj, AsyncClient* asyncClient) {
+//     Serial.println("Connected to server");
+//     String request = "GET /heartbeat?ip=" + WiFi.localIP().toString() + " HTTP/1.1\r\n"
+//                     "Host: example.com\r\n"
+//                     "Connection: close\r\n\r\n";
+//     asyncClient->add(request.c_str(), request.length());
+//   }, NULL);
 
-    delay(10000); // Send heartbeat every 10 seconds
+//   asyncClient.onError([](void* obj, AsyncClient* asyncClient, int8_t error) {
+//     Serial.println("Connection error");
+//     asyncClient->close();
+//   }, NULL);
+
+//   asyncClient.onDisconnect([](void* obj, AsyncClient* asyncClient) {
+//     Serial.println("Disconnected from server");
+//     asyncClient->close();
+//   }, NULL);
+
+//   asyncClient.connect("example.com", 80);
+// }
+
+
+void loop() {
+  // if (WiFi.status() == WL_CONNECTED) {
+  //   heartbeat();
+  // }
+  // delay(10000); // Send heartbeat every 10 seconds
 }
