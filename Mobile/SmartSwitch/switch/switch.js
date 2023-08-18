@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card, TextInput, Button, IconButton } from 'react-native-paper';
+import { Card, TextInput, Button, IconButton, Text } from 'react-native-paper';
 
 const Switch = ({ device, onPress, onRemove }) => {
     const [switched, setSwitched] = useState(false);
     const [deviceAddress, setDeviceAddress] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const fetchData = async () => {
         try {
-            // todo move to env file
             const END_POINT = `http://${deviceAddress}:9090/control?switch=1`;
             const response = await fetch(END_POINT);
-            const responseData = await response.json(); // Get the response text
+            const responseData = await response.json();
 
             if (responseData.message === 'true') {
                 setSwitched(true);
@@ -19,9 +19,11 @@ const Switch = ({ device, onPress, onRemove }) => {
                 setSwitched(false);
             }
 
+            setErrorMessage('');
             return response;
         } catch (error) {
             console.error('Error fetching data:', error);
+            setErrorMessage('Please setup your device first');
         }
     };
 
@@ -48,14 +50,17 @@ const Switch = ({ device, onPress, onRemove }) => {
                     />
                 </Card.Content>
                 <Card.Actions style={styles.cardActions}>
-                        <IconButton
-                            onPress={fetchData}
-                            icon="lightbulb-on-outline"
-                            size={30}
-                            mode="contained"
-                            iconColor={switched ? '#FFA500' : '#312f2f'}
-                        />
+                    <IconButton
+                        onPress={fetchData}
+                        icon="lightbulb-on-outline"
+                        size={30}
+                        mode="contained"
+                        iconColor={switched ? '#FFA500' : '#312f2f'}
+                    />
                 </Card.Actions>
+                {errorMessage ? (
+                    <Text style={styles.errorMessage}>{errorMessage}</Text>
+                ) : null}
             </Card>
         </View>
     );
@@ -76,6 +81,11 @@ const styles = StyleSheet.create({
     },
     cardActions: {
         justifyContent: 'center',
+    },
+    errorMessage: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 10,
     },
 });
 
