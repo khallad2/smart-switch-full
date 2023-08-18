@@ -1,30 +1,52 @@
 #include <Servo_ESP32.h>
 #include <WiFi.h>
-#include <ArduinoJson.h> // Include the ArduinoJson library
-#include <ESPAsyncWebSrv.h> // Include the modified ESPAsyncWebServer library
+#include <WiFiManager.h>  // Add WiFiManager library
+#include <ArduinoJson.h>
+#include <ESPAsyncWebSrv.h>
 
-static const int servoPin = 14;  //printed G14 on the board
-const char* serverUrl = "http://localhost:3000/heartbeat"; // Replace with your server URL
+static const int servoPin = 14;
+const char* serverUrl = "http://localhost:3000/heartbeat";
 
 Servo_ESP32 myServo;
 WiFiClient client;
 
-const char* ssid = "Bananenkarton";
-const char* password = "88542283243511630573";
 bool switched = false;
 
-AsyncWebServer server(80);
+AsyncWebServer server(9090);
 
 void setup() {
   Serial.begin(115200);
-  connect_to_wifi(ssid, password);
+  WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
+
+  // WiFiManager Configuration
+  WiFiManager wm;
+  wm.resetSettings();
+  
+  bool res = wm.autoConnect("Smart-Switch", "password-switch");  // Change to desired Smart-Switch name and password
+  if(!res) {
+      Serial.println("Failed to connect");
+        // ESP.restart();
+  }
+
+  WiFi.begin(wm.getWiFiSSID().c_str(), wm.getWiFiPass().c_str());
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+  //if you get here you have connected to the WiFi    
+  Serial.println("connected...yeey :)");
 
   myServo.attach(servoPin);
+  myServo.write(1);
   myServo.write(0);
 
+
+  // API Requests Setup
   server.on("/setAngle", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam("switch")) {
-      int mySwitch = request->getParam("switch")->value().toInt();
+      String value = request->getParam("switch")->value();
+      int mySwitch = value.toInt();
       if (mySwitch == 1) {
         toggleServo();
       } else {
@@ -38,27 +60,6 @@ void setup() {
   });
 
   server.begin();
-}
-
-bool connect_to_wifi(const char* ssid, const char* password) {
-  if (ssid && password && strlen(ssid) > 0 && strlen(password) > 0) {
-    WiFi.begin(ssid, password);
-    int timeout = 10;
-    while (WiFi.status() != WL_CONNECTED && timeout > 0) {
-      delay(1000);
-      Serial.println("Connecting to WiFi...");
-      timeout--;
-    }
-
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("Connected to WiFi");
-      return true;
-    } else {
-      Serial.println("Failed to connect to WiFi");
-      return false;
-    }
-  }
-  return false;
 }
 
 void toggleServo() {
@@ -97,3 +98,4 @@ void loop() {
   // }
   // delay(10000); // Send heartbeat every 10 seconds
 }
+
