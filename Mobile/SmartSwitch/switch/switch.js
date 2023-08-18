@@ -11,7 +11,14 @@ const Switch = ({ device, onPress, onRemove }) => {
             // todo move to env file
             const END_POINT = `http://${deviceAddress}:9090/setAngle?switch=1`;
             const response = await fetch(END_POINT);
-            setSwitched(prevSwitched => !prevSwitched);
+            const responseData = await response.json(); // Get the response text
+
+            if (responseData.message === 'true') {
+                setSwitched(true);
+            } else if (responseData.message === 'false') {
+                setSwitched(false);
+            }
+
             return response;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -41,9 +48,13 @@ const Switch = ({ device, onPress, onRemove }) => {
                     />
                 </Card.Content>
                 <Card.Actions style={styles.cardActions}>
-                    <Button onPress={fetchData} mode="contained" color={switched ? 'green' : 'default'}>
-                        {switched ? 'Switched ON' : 'Switched OFF'}
-                    </Button>
+                        <IconButton
+                            onPress={fetchData}
+                            icon="lightbulb-on-outline"
+                            size={30}
+                            mode="contained"
+                            iconColor={switched ? '#FFA500' : '#312f2f'}
+                        />
                 </Card.Actions>
             </Card>
         </View>
