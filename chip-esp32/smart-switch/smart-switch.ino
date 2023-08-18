@@ -43,7 +43,7 @@ void setup() {
 
 
   // API Requests Setup
-  server.on("/setAngle", HTTP_GET, [](AsyncWebServerRequest* request) {
+  server.on("/control", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam("switch")) {
       String value = request->getParam("switch")->value();
       int mySwitch = value.toInt();
@@ -52,7 +52,7 @@ void setup() {
       } else {
         request->send(400, "application/json", "{\"message\":\"Invalid switch parameter\"}");
       }
-      String response = "{\"message\":\"" + String(switched ? "On" : "Off") + "\"}";
+      String response = "{\"message\":\"" + String(switched ? "true" : "false") + "\"}";
       request->send(200, "application/json", response);
     } else {
       request->send(400, "application/json", "{\"message\":\"Missing switch parameter\"}");
