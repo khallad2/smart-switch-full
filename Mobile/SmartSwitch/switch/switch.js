@@ -12,7 +12,7 @@ const Switch = ({ device, onPress, onRemove }) => {
             const END_POINT = `http://${deviceAddress}:9090/control?switch=1`;
             const response = await fetch(END_POINT);
             const responseData = await response.json();
-
+            console.log(responseData);
             if (responseData.message === 'true') {
                 setSwitched(true);
             } else if (responseData.message === 'false') {
@@ -23,41 +23,43 @@ const Switch = ({ device, onPress, onRemove }) => {
             return response;
         } catch (error) {
             console.error('Error fetching data:', error);
-            setErrorMessage('Please setup your device first');
+            setErrorMessage('Please set up your device first');
         }
     };
 
     return (
         <View>
-            <Card style={styles.card}>
+            <Card  onPress={fetchData}
+                style={[
+                    styles.card,
+                    switched ? styles.cardSwitched : styles.cardNotSwitched,
+                ]}
+            >
                 <Card.Title
                     title={device.name}
-                    titleStyle={styles.cardTitle}
+                    titleStyle={[
+                        styles.cardTitle,
+                        switched ? styles.cardTitleSwitched : styles.cardTitleNotSwitched,
+                    ]}
                     right={() => (
                         <IconButton
-                            icon="delete"
-                            color="red"
-                            onPress={() => onRemove(device.id)}
+                            icon="lightbulb-on-outline"
+                            size={30}
+                            mode="contained"
+                            iconColor={switched ? '#FFA500' : '#312f2f'}
                         />
                     )}
                 />
                 <Card.Content>
-                    <TextInput
-                        label="Device Address"
-                        value={deviceAddress}
-                        onChangeText={setDeviceAddress}
-                        style={styles.inputField}
-                    />
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            label="Device Address"
+                            value={deviceAddress}
+                            onChangeText={setDeviceAddress}
+                            style={styles.inputField}
+                        />
+                    </View>
                 </Card.Content>
-                <Card.Actions style={styles.cardActions}>
-                    <IconButton
-                        onPress={fetchData}
-                        icon="lightbulb-on-outline"
-                        size={30}
-                        mode="contained"
-                        iconColor={switched ? '#FFA500' : '#312f2f'}
-                    />
-                </Card.Actions>
                 {errorMessage ? (
                     <Text style={styles.errorMessage}>{errorMessage}</Text>
                 ) : null}
@@ -71,13 +73,33 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginHorizontal: 20,
         padding: 10,
+        elevation: 2,
+    },
+    cardSwitched: {
+        backgroundColor: '#FFA500',
+    },
+    cardNotSwitched: {
+        backgroundColor: 'white',
     },
     cardTitle: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: 'white', // Set the default text color
+    },
+    cardTitleSwitched: {
+        color: 'white',
+    },
+    cardTitleNotSwitched: {
+        color: 'black',
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
     },
     inputField: {
-        marginBottom: 10,
+        flex: 1,
+        marginRight: 10,
     },
     cardActions: {
         justifyContent: 'center',
